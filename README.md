@@ -1,422 +1,175 @@
 # Auto Poster Generator
 
-```
-    ██████  ▄████▄   ██▀███   ▄▄▄       ██▓███  ▓█████  ██▀███     
-▒██    ▒ ▒██▀ ▀█  ▓██ ▒ ██▒▒████▄    ▓██░  ██▒▓█   ▀ ▓██ ▒ ██▒   
-░ ▓██▄   ▒▓█    ▄ ▓██ ░▄█ ▒▒██  ▀█▄  ▓██░ ██▓▒▒███   ▓██ ░▄█ ▒   
-  ▒   ██▒▒▓▓▄ ▄██▒▒██▀▀█▄  ░██▄▄▄▄██ ▒██▄█▓▒ ▒▒▓█  ▄ ▒██▀▀█▄     
-▒██████▒▒▒ ▓███▀ ░░██▓ ▒██▒ ▓█   ▓██▒▒██▒ ░  ░░▒████▒░██▓ ▒██▒   
-▒ ▒▓▒ ▒ ░░ ░▒ ▒  ░░ ▒▓ ░▒▓░ ▒▒   ▓▒█░▒▓▒░ ░  ░░░ ▒░ ░░ ▒▓ ░▒▓░   
-░ ░▒  ░ ░  ░  ▒     ░▒ ░ ▒░  ▒   ▒▒ ░░▒ ░      ░ ░  ░  ░▒ ░ ▒░   
-░  ░  ░  ░          ░░   ░   ░   ▒   ░░          ░     ░░   ░    
-      ░  ░ ░         ░           ░  ░            ░  ░   ░        
-         ░                                                       
-                                                                 
-               AUTO POSTER GENERATOR v5.0 – FINAL                
-```
+Auto Poster Generator is a fully functional Python script that
+automatically parses car data from https://www.automobile-catalog.com
+and generates a poster in the style of the provided reference (e.g.,
+"AUDI TT RS").
 
-Автоматический генератор постеров с техническими характеристиками автомобилей. Парсит данные с [automobile-catalog.com](https://www.automobile-catalog.com), загружает фото с Unsplash и создает минималистичные постеры.
+The script:
 
-## ✨ Возможности
+-   accepts a car name (e.g., `Audi TT RS`)
+-   automatically finds the corresponding model on the website
+-   parses technical specifications
+-   fetches a car image (via Unsplash API)
+-   removes the background (via remove.bg API)
+-   generates a styled poster
+-   saves the result as a PNG image
 
-- 🚗 **Автоматический парсинг** характеристик с automobile-catalog.com
-- 🖼️ **Загрузка фото** через Unsplash API
-- 🎨 **Удаление фона** через remove.bg API
-- 🎯 **Минималистичный дизайн** постера
-- 🔒 **Обход Cloudflare** с сохранением cookies
-- 📦 **Fallback база** для популярных моделей
-- 🌍 **Флаги стран** производителей
+The main priority of this project is the final visual output matching
+the reference style.
 
-## 📋 Зависимости
+------------------------------------------------------------------------
 
-```bash
-pip install selenium undetected-chromedriver beautifulsoup4 Pillow requests
-```
+## How It Works
 
-### Требования
+### 1. Data Search and Parsing
 
-- Python 3.8+
-- Google Chrome/Chromium
-- Unsplash API Key (опционально, но рекомендуется)
-- Remove.bg API Key (опционально для удаления фона)
+The script uses Selenium (undetected_chromedriver) to interact with
+automobile-catalog.com.
 
-## 🚀 Быстрый старт
+Process:
 
-### 1. Клонирование репозитория
+1.  Opens the brand page (e.g., `list-audi.html`)
+2.  Automatically finds the requested model
+3.  Navigates to the specifications page
+4.  Parses:
+    -   Engine
+    -   Power
+    -   Torque
+    -   0--100 km/h
+    -   Top speed
+    -   Weight
+    -   Year
 
-```bash
-git clone https://github.com/your-username/auto-poster-generator.git
-cd auto-poster-generator
-```
+### Cloudflare and "I am human" Verification
 
-### 2. Установка зависимостей
+The website is protected by Cloudflare.
 
-```bash
-pip install -r requirements.txt
-```
+On the first run:
 
-### 3. Настройка API ключей (опционально)
+-   A browser window will open.
+-   You must manually complete the "I am human" verification.
+-   After successful verification, the script saves cookies to
+    `cookies_selenium.pkl`.
 
-```bash
-# Unsplash API (для загрузки фото)
-export UNSPLASH_ACCESS_KEY="your_unsplash_key"
+After that:
 
-# Remove.bg API (для удаления фона)
-export REMOVEBG_API_KEY="your_removebg_key"
-```
+-   Manual verification is no longer required.
+-   The script will run automatically using the saved cookies.
 
-По умолчанию в коде уже прописаны тестовые ключи, но лучше использовать свои.
+This manual step is required only once.
 
-### 4. Первый запуск
+------------------------------------------------------------------------
 
-```bash
-python auto_poster.py --car "Porsche 911"
-```
-
-**При первом запуске:**
-1. Откроется браузер Chrome
-2. Загрузится сайт automobile-catalog.com
-3. Если появится Cloudflare CAPTCHA — пройдите её вручную (кликните галочку)
-4. Cookies сохранятся автоматически
-5. Все последующие запуски будут полностью автоматическими!
+## Poster Generation
 
-## 📖 Примеры использования
-
-### Базовое использование
-
-```bash
-# Простой запрос
-python auto_poster.py --car "Porsche 911"
-
-# BMW M4
-python auto_poster.py --car "BMW M4"
-
-# Audi TT RS
-python auto_poster.py --car "Audi TT RS"
-
-# Ferrari 488
-python auto_poster.py --car "Ferrari 488"
-```
-
-### С кастомным именем файла
-
-```bash
-python auto_poster.py --car "Lamborghini Aventador" --output my_lambo.png
-```
-
-### Как искать конкретные модели
-
-#### Формат запроса
-
-```
-python auto_poster.py --car "<BRAND> <MODEL>"
-```
-
-#### Примеры:
-
-**Работает:**
-- `"Porsche 911"` → найдет Porsche 911
-- `"BMW M4"` → найдет BMW M4  
-- `"Audi TT RS"` → найдет Audi TT RS
-- `"Mercedes AMG GT"` → найдет Mercedes-AMG GT
-- `"Ferrari"` → найдет первую модель Ferrari из списка
-
-**Не работает:**
-- `"911"` → нужен бренд: `"Porsche 911"`
-- `"M4 BMW"` → неправильный порядок, нужно: `"BMW M4"`
-
-#### Как найти редкую модель
-
-1. Откройте https://www.automobile-catalog.com/list-{brand}.html
-2. Найдите точное название модели
-3. Используйте его в запросе
-
-Пример:
-```bash
-# Вместо "Pagani"
-python auto_poster.py --car "Pagani Huayra"
-
-# Вместо "Koenigsegg"
-python auto_poster.py --car "Koenigsegg Jesko"
-```
-
-## 🎨 Дизайн постера
-
-Постер создается точно по референсу:
-
-```
-┌─────────────────────────────────────────┐
-│ PORSCHE                            (серый)
-│ 911                                (черный)
-│                                         │
-│  ┌─────────────────────┐               │
-│  │                     │               │
-│  │    [CAR IMAGE]      │   (серый фон) │
-│  │   (без фона)        │               │
-│  │                     │               │
-│  └─────────────────────┘               │
-│                                         │
-│ YEAR  │ Engine   3.0L    0-100 km/h   │
-│ 2019- │ Power    379 HP  4.2 s         │
-│  2024 │ Torque   450 Nm  Top speed     │
-│       │ Weight   1505kg  293 km/h  🇩🇪  │
-└─────────────────────────────────────────┘
-```
-
-### Элементы дизайна
-
-- ✅ **Бренд серый** (вверху слева)
-- ✅ **Модель черная** (под брендом)
-- ✅ **Серый фон** за фото машины
-- ✅ **Фото без фона** (через remove.bg)
-- ✅ **Год слева внизу**
-- ✅ **Вертикальная разделительная линия**
-- ✅ **Характеристики в две колонки**
-- ✅ **Флаг страны производителя**
-
-## 📊 Логика работы
-
-### 1. Парсинг данных
-
-```
-Запрос: "Porsche 911"
-   ↓
-Открывается: https://www.automobile-catalog.com/list-porsche.html
-   ↓
-Парсится список моделей
-   ↓
-Выбирается релевантная модель (с "911" в названии)
-   ↓
-Открывается страница модели
-   ↓
-Извлекаются характеристики через regex
-```
-
-### 2. Fallback механизм
-
-Если парсинг не извлек какие-то данные, они **дополняются** из fallback базы:
-
-```python
-# Пример: парсинг нашел только power и year
-Parsed: {
-    'power': '231 HP',
-    'year': '2016-2024',
-    'engine': None,  # Не найдено
-    'torque': None   # Не найдено
-}
-
-# Fallback ДОПОЛНЯЕТ недостающие данные
-Final: {
-    'power': '231 HP',        # Из парсинга
-    'year': '2016-2024',      # Из парсинга
-    'engine': '3.0L Twin-Turbo',  # Из fallback
-    'torque': '450 Nm'        # Из fallback
-}
-```
-
-### 3. Загрузка фото
-
-1. Запрос к Unsplash API: `"{brand} {model} car"`
-2. Загрузка первого результата
-3. Отправка в remove.bg для удаления фона
-4. Возврат изображения с прозрачным фоном
-
-## 🔧 Технические детали
-
-### Cloudflare Bypass
-
-Скрипт использует `undetected-chromedriver` для обхода Cloudflare:
-
-```python
-# При первом запуске
-1. Открывается браузер
-2. Детектируется Cloudflare CAPTCHA
-3. Пользователь проходит капчу вручную
-4. Cookies сохраняются в cookies_selenium.pkl
-
-# Последующие запуски
-1. Cookies загружаются автоматически
-2. Cloudflare больше не появляется
-```
-
-### Парсинг характеристик
-
-Используются regex паттерны для извлечения:
-
-```python
-# Двигатель
-r'(\d+\.?\d*\s*L\s+(?:Twin-Turbo|Turbo|V\d+|TFSI))'
-# Результат: "3.0L Twin-Turbo"
-
-# Мощность
-r'(\d+)\s*(?:hp|HP|ps|PS)'
-# Результат: "379 HP"
-
-# Разгон 0-100
-r'(\d+\.?\d*)\s*s.*?0-100'
-# Результат: "4.2 s"
-```
-
-### Структура данных
-
-```python
-specs = {
-    'model': 'Porsche 911',
-    'engine': '3.0L Twin-Turbo',
-    'power': '379 HP',
-    'torque': '450 Nm',
-    'acceleration': '4.2 s',
-    'top_speed': '293 km/h',
-    'weight': '1505 kg',
-    'year': '2019-2024',
-    'country': 'GERMANY'
-}
-```
-
-## 🛠️ Решение проблем
-
-### "Cloudflare timeout"
-
-**Проблема**: Не успели пройти капчу за 5 минут
-
-**Решение**:
-```bash
-# Удалите старые cookies
-rm cookies_selenium.pkl
-
-# Запустите снова и пройдите капчу быстрее
-python auto_poster.py --car "Porsche 911"
-```
-
-### "No models found"
-
-**Проблема**: Бренд не найден на сайте
-
-**Решение**:
-1. Проверьте правильность написания бренда
-2. Откройте https://www.automobile-catalog.com
-3. Найдите точное название бренда
-4. Попробуйте снова
-
-Примеры:
-```bash
-# Неправильно
-python auto_poster.py --car "Merc E-Class"
-
-# Правильно
-python auto_poster.py --car "Mercedes E-Class"
-```
-
-### "Could not fetch image"
-
-**Проблема**: Unsplash API не вернул результатов
-
-**Решение**:
-- Проверьте API ключ
-- Попробуйте другое название модели
-- Постер создастся без фото (только характеристики)
-
-### Все характеристики "N/A"
-
-**Проблема**: Парсинг не извлек данные, fallback не сработал
-
-**Решение**: Добавьте модель в fallback базу в коде:
-
-```python
-FALLBACK_DB = {
-    "your car": {
-        "model": "Your Car Name",
-        "engine": "3.0L V6",
-        "power": "400 HP",
-        "torque": "500 Nm",
-        "acceleration": "4.5 s",
-        "top_speed": "280 km/h",
-        "weight": "1600 kg",
-        "year": "2020-2024",
-        "country": "GERMANY"
-    }
-}
-```
-
-## 📁 Структура проекта
-
-```
-auto-poster-generator/
-├── auto_poster.py           # Основной скрипт
-├── requirements.txt         # Зависимости Python
-├── README.md               # Этот файл
-├── cookies_selenium.pkl    # Cookies (создается автоматически)
-└── poster_*.png           # Сгенерированные постеры
-```
-
-## 🌟 Примеры результатов
-
-### Audi TT RS
-```bash
-python auto_poster.py --car "Audi TT RS"
-```
-
-**Характеристики:**
-- Двигатель: 2.5L TFSI
-- Мощность: 394 HP
-- Крутящий момент: 480 Nm
-- 0-100 км/ч: 3.7 s
-- Макс. скорость: 250 km/h
-- Вес: 1450 kg
-- Год: 2016-2023
-
-### Porsche 911
-```bash
-python auto_poster.py --car "Porsche 911"
-```
-
-**Характеристики:**
-- Двигатель: 3.0L Twin-Turbo
-- Мощность: 379 HP
-- Крутящий момент: 450 Nm
-- 0-100 км/ч: 4.2 s
-- Макс. скорость: 293 km/h
-- Вес: 1505 kg
-- Год: 2019-2024
-
-### BMW M4
-```bash
-python auto_poster.py --car "BMW M4"
-```
-
-**Характеристики:**
-- Двигатель: 3.0L TwinTurbo
-- Мощность: 503 HP
-- Крутящий момент: 650 Nm
-- 0-100 км/ч: 3.5 s
-- Макс. скорость: 250 km/h
-- Вес: 1725 kg
-- Год: 2021-2024
-
-## 🤝 Вклад в проект
-
-Приветствуются:
-- 🐛 Сообщения об ошибках
-- 💡 Предложения новых функций
-- 🔧 Pull requests
-- 📝 Улучшения документации
-
-## 📄 Лицензия
-
-MIT License - свободное использование в личных и коммерческих целях.
-
-## 🙏 Благодарности
-
-- [automobile-catalog.com](https://www.automobile-catalog.com) - база данных автомобилей
-- [Unsplash](https://unsplash.com) - фотографии автомобилей
-- [Remove.bg](https://remove.bg) - удаление фона
-- [undetected-chromedriver](https://github.com/ultrafunkamsterdam/undetected-chromedriver) - обход Cloudflare
-
-## 📞 Контакты
-
-Вопросы? Проблемы? Создайте Issue на GitHub!
-
----
-
-**Made with ❤️ for car enthusiasts**
+After collecting specifications:
 
+-   The script downloads a car image via Unsplash API.
+-   Removes the background using remove.bg API.
+-   Generates an 800x1200 poster layout.
+-   Creates composition:
+    -   brand (gray)
+    -   model (black)
+    -   central gray block
+    -   centered vehicle image
+    -   specifications block
+    -   manufacturer country flag
+
+The final result is saved as a PNG file.
+
+------------------------------------------------------------------------
+
+## Installation
+
+### 1. Clone the repository
+
+    git clone https://github.com/your-username/auto-poster-generator.git
+    cd auto-poster-generator
+
+### 2. Install dependencies
+
+Python 3.9+ is recommended.
+
+    pip install -r requirements.txt
+
+Main dependencies:
+
+-   requests
+-   beautifulsoup4
+-   selenium
+-   undetected-chromedriver
+-   pillow
+
+------------------------------------------------------------------------
+
+## Environment Variables (Optional)
+
+You can define API keys via environment variables:
+
+    export REMOVEBG_API_KEY=your_key
+    export UNSPLASH_ACCESS_KEY=your_key
+
+If remove.bg key is not provided, the original image will be used
+without background removal.
+
+------------------------------------------------------------------------
+
+## Usage
+
+Example:
+
+    python auto_poster.py --car "Audi TT RS"
+
+With custom output filename:
+
+    python auto_poster.py --car "Porsche 911" --output poster.png
+
+The generated poster will be saved in the current directory.
+
+------------------------------------------------------------------------
+
+## Project Structure
+
+    auto_poster.py          # main script
+    cookies_selenium.pkl    # saved cookies (created automatically after first verification)
+
+------------------------------------------------------------------------
+
+## Features
+
+-   Fully automated parsing
+-   Cloudflare bypass via undetected_chromedriver
+-   One-time manual verification
+-   Automatic cookie persistence
+-   Fixed layout poster generation
+-   Fallback specification database if parsing fails
+
+------------------------------------------------------------------------
+
+## Limitations
+
+-   Requires installed Google Chrome
+-   First run requires manual Cloudflare verification
+-   Image quality depends on Unsplash API results
+-   remove.bg has API usage limits
+
+------------------------------------------------------------------------
+
+## Purpose
+
+This project was created as part of a technical test assignment:
+
+-   automatic data scraping
+-   poster generation based on reference
+-   image export
+-   focus on final visual result over tech stack
+
+------------------------------------------------------------------------
+
+Potential improvements:
+
+-   image caching
+-   enhanced parsing accuracy
+-   multiple poster templates
+-   extended country flag support
